@@ -5,15 +5,24 @@ import { VisualizerCanvas } from "./features/visual/VisualizerCanvas";
 import type { VisualMode } from "./features/visual/Blob";
 
 export function App() {
-  const audio = useAudioAnalyser();
+  /**
+   * 全体の状態管理
+   */
+  const [isPlaying, setIsPlaying] = useState(false); // 再生ON/OFF
+  const [intensity, setIntensity] = useState(1.0); // ビジュアル強度
+  const [volume, setVolume] = useState(0.8); // 音量
+  const [mode, setMode] = useState<VisualMode>("neon"); // 表示テーマ
 
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [intensity, setIntensity] = useState(1.0);
-  const [volume, setVolume] = useState(0.8);
-  const [mode, setMode] = useState<VisualMode>("minimal");
+  /**
+   * HTMLAudioElementで音を鳴らしつつ、
+   * WebAudioのAnalyserでFFT（周波数データ）を取る」* ためのフック
+   */
+  const audio = useAudioAnalyser();
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
+
+      {/* 背景WebGL */ }
       <VisualizerCanvas
         updateAudio={audio.update}
         getBands={audio.getBands}
@@ -21,7 +30,7 @@ export function App() {
         mode={mode}
       />
 
-      {/* hidden audio element */}
+      {/* オーディオ */}
       <audio ref={audio.audioElRef} />
 
       {/* UI */}
@@ -56,9 +65,9 @@ export function App() {
               value={mode}
               onChange={(v) => setMode(v as VisualMode)}
               data={[
+                { label: "Neon", value: "neon" },
                 { label: "Minimal", value: "minimal" },
                 { label: "Wire", value: "wire" },
-                { label: "Neon", value: "neon" },
               ]}
             />
             <div style={{ marginTop: 14 }}>
