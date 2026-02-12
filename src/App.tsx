@@ -12,7 +12,6 @@ const tracks = [
   { label: "桜日和（魔王魂）", value: "/mp3/sample2.mp3" },
 ]
 
-
 export function App() {
   /**
    * HTMLAudioElementで音を鳴らしつつ、
@@ -34,7 +33,13 @@ export function App() {
    * 楽曲のセットを管理
    */
   useEffect(() => {
+    // srcを差し替え
     audio.setSrc(trackSrc);
+
+    // 再生位置をリセット
+    const audioEl = audio.audioElRef.current;
+    if (!audioEl) return;
+    audioEl.currentTime = 0;
   }, [audio, trackSrc]);
 
   /**
@@ -108,7 +113,12 @@ export function App() {
                 audio.pause();
                 setIsPlaying(false);
               }}
-              />
+              styles={{
+                dropdown: { backgroundColor: "#fff" },
+                option: { color: "#111" },
+                label: { color: "#fff" },
+              }}
+            />
           </Paper>
 
           <Paper withBorder p="md" radius="md" style={{ width: 320, backdropFilter: "blur(8px)", background: "rgba(16,18,24,0.65)" }}>
