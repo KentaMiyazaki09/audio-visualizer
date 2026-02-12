@@ -1,8 +1,17 @@
 import { useEffect, useState } from "react";
-import { Button, Group, Slider, SegmentedControl, Paper, Text } from "@mantine/core";
+import { Button, Group, Slider, SegmentedControl, Paper, Text, Select } from "@mantine/core";
 import { useAudioAnalyser } from "./features/audio/useAudioAnalyser";
 import { VisualizerCanvas } from "./features/visual/VisualizerCanvas";
 import type { VisualMode } from "./features/visual/Blob";
+
+/**
+ * サンプル楽曲の一覧
+ */
+const tracks = [
+  { label: "シャイニングスター（魔王魂）", value: "/mp3/sample.mp3" },
+  { label: "桜日和（魔王魂）", value: "/mp3/sample2.mp3" },
+]
+
 
 export function App() {
   /**
@@ -19,25 +28,34 @@ export function App() {
   const [volume, setVolume] = useState(0.8); // 音量
   const [mode, setMode] = useState<VisualMode>("neon"); // 表示テーマ
 
+  const [trackSrc, setTrackSrc] = useState(tracks[0].value)
+
+  /**
+   * 楽曲のセットを管理
+   */
+  useEffect(() => {
+    audio.setSrc(trackSrc);
+  }, [audio, trackSrc]);
+
   /**
    * audioのstart/pauseの切り替え
    */
   useEffect(() => {
-    const audioEl = audio.audioElRef.current
-    if (!audioEl) return
+    const audioEl = audio.audioElRef.current;
+    if (!audioEl) return;
 
-    const onEnded = () => setIsPlaying(false)
-    const onPlay = () => setIsPlaying(true)
-    const onPause = () => setIsPlaying(false)
+    const onEnded = () => setIsPlaying(false);
+    const onPlay = () => setIsPlaying(true);
+    const onPause = () => setIsPlaying(false);
 
-    audioEl.addEventListener("ended", onEnded)
-    audioEl.addEventListener("play", onPlay)
-    audioEl.addEventListener("pause", onPause)
+    audioEl.addEventListener("ended", onEnded);
+    audioEl.addEventListener("play", onPlay);
+    audioEl.addEventListener("pause", onPause);
     
     return () => {
-      audioEl.removeEventListener("ended", onEnded)
-      audioEl.removeEventListener("play", onPlay)
-      audioEl.removeEventListener("pause", onPause)
+      audioEl.removeEventListener("ended", onEnded);
+      audioEl.removeEventListener("play", onPlay);
+      audioEl.removeEventListener("pause", onPause);
     }
   }, [audio.audioElRef])
 
@@ -62,8 +80,10 @@ export function App() {
             <Group gap="md">
               <Button
                 onClick={async () => {
-                  audio.setSrc("/mp3/sample.mp3");
-                  if (!isPlaying) {
+                  const el = audio.audioElRef.current;
+                  if (!el) return;
+
+                  if (el.paused) {
                     await audio.play();
                     audio.setVolume(volume);
                   } else {
@@ -77,6 +97,18 @@ export function App() {
                 {mode.toUpperCase()}
               </Text>
             </Group>
+
+            <Select
+              label="Track"
+              data={tracks}
+              value={trackSrc}
+              onChange={(v) => {
+                if (!v) return;
+                setTrackSrc(v);
+                audio.pause();
+                setIsPlaying(false);
+              }}
+              />
           </Paper>
 
           <Paper withBorder p="md" radius="md" style={{ width: 320, backdropFilter: "blur(8px)", background: "rgba(16,18,24,0.65)" }}>
