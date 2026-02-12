@@ -13,7 +13,7 @@ const brand = [
   "#C7D2FE",
   "#A5B4FC",
   "#818CF8",
-  "#6366F1", // ←これが “メイン” にしたい色
+  "#6366F1",
   "#4F46E5",
   "#4338CA",
   "#3730A3",
@@ -26,7 +26,7 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
       theme={{
         colors: { brand },
         primaryColor: "brand",
-        primaryShade: 5,
+        primaryShade: 5, // "#6366F1",
         defaultRadius: "md",
       }}
     >
