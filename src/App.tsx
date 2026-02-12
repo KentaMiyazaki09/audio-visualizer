@@ -1,10 +1,16 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Group, Slider, SegmentedControl, Paper, Text } from "@mantine/core";
 import { useAudioAnalyser } from "./features/audio/useAudioAnalyser";
 import { VisualizerCanvas } from "./features/visual/VisualizerCanvas";
 import type { VisualMode } from "./features/visual/Blob";
 
 export function App() {
+  /**
+   * HTMLAudioElementで音を鳴らしつつ、
+   * WebAudioのAnalyserでFFT（周波数データ）を取る」* ためのフック
+   */
+  const audio = useAudioAnalyser();
+
   /**
    * 全体の状態管理
    */
@@ -14,10 +20,26 @@ export function App() {
   const [mode, setMode] = useState<VisualMode>("neon"); // 表示テーマ
 
   /**
-   * HTMLAudioElementで音を鳴らしつつ、
-   * WebAudioのAnalyserでFFT（周波数データ）を取る」* ためのフック
+   * audioのstart/pauseの切り替え
    */
-  const audio = useAudioAnalyser();
+  useEffect(() => {
+    const audioEl = audio.audioElRef.current
+    if (!audioEl) return
+
+    const onEnded = () => setIsPlaying(false)
+    const onPlay = () => setIsPlaying(true)
+    const onPause = () => setIsPlaying(false)
+
+    audioEl.addEventListener("ended", onEnded)
+    audioEl.addEventListener("play", onPlay)
+    audioEl.addEventListener("pause", onPause)
+    
+    return () => {
+      audioEl.removeEventListener("ended", onEnded)
+      audioEl.removeEventListener("play", onPlay)
+      audioEl.removeEventListener("pause", onPause)
+    }
+  }, [audio.audioElRef])
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
@@ -44,10 +66,8 @@ export function App() {
                   if (!isPlaying) {
                     await audio.play();
                     audio.setVolume(volume);
-                    setIsPlaying(true);
                   } else {
                     audio.pause();
-                    setIsPlaying(false);
                   }
                 }}
               >
