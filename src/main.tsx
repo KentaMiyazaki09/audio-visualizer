@@ -4,7 +4,7 @@ import { MantineProvider } from "@mantine/core";
 import "@mantine/core/styles.css";
 
 import { App } from "./App";
-import "./styles/app.css";
+import "./styles/App.css";
 
 /* テーマカラー 10段階 */
 const brand = [
