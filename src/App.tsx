@@ -11,6 +11,8 @@ import IconPause from "/icons/pause.svg";
  * サンプル楽曲の一覧
  */
 const tracks = [
+  { label: "Cassette Tape Dream（DOVA SYNDROME）", value: "/mp3/sample4.mp3" },
+  { label: "極東の羊、テレキャスターと踊る（DOVA SYNDROME）", value: "/mp3/sample3.mp3" },
   { label: "シャイニングスター（魔王魂）", value: "/mp3/sample.mp3" },
   { label: "桜日和（魔王魂）", value: "/mp3/sample2.mp3" },
 ]
@@ -70,20 +72,20 @@ export function App() {
   /**
    * band値確認用
    */
-  const [bandsUI, setBandsUI] = useState({ bass: 0, mid: 0, treble: 0 });
-  useEffect(() => {
-    const id = window.setInterval(() => setBandsUI(audio.getBands()), 100);
-    return () => clearInterval(id);
-  }, [audio]);
+  // const [bandsUI, setBandsUI] = useState({ bass: 0, mid: 0, treble: 0 });
+  // useEffect(() => {
+  //   const id = window.setInterval(() => setBandsUI(audio.getBands()), 100);
+  //   return () => clearInterval(id);
+  // }, [audio]);
 
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
       {/*
         * band値確認用
       */}
-      <Text size="xs" c="dimmed">
+      {/* <Text size="xs" c="dimmed">
         b:{bandsUI.bass.toFixed(2)} m:{bandsUI.mid.toFixed(2)} t:{bandsUI.treble.toFixed(2)}
-      </Text>
+      </Text> */}
 
 
       {/* 背景WebGL */ }
@@ -177,8 +179,8 @@ export function App() {
             <div style={{ marginTop: 14 }}>
               <Text size="sm" c={"#A0A0A0"}>Intensity</Text>
               <Slider
-                value={Math.round(intensity * 50)}
-                onChange={(v) => setIntensity(v / 50)}
+                value={Math.round(intensity * 70)}
+                onChange={(v) => setIntensity(v / 70)}
               />
             </div>
           </Paper>

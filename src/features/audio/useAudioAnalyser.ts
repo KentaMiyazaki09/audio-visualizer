@@ -27,12 +27,12 @@ import { useCallback, useMemo, useRef } from "react";
 export type Bands = { bass: number; mid: number; treble: number };
 
 /* 安定させる */
-function avg(arr: Uint8Array, from: number, to: number) {
-  let sum = 0;
-  const end = Math.min(arr.length, to);
-  for (let i = from; i < end; i++) sum += arr[i];
-  return sum / Math.max(1, end - from);
-}
+// function avg(arr: Uint8Array, from: number, to: number) {
+//   let sum = 0;
+//   const end = Math.min(arr.length, to);
+//   for (let i = from; i < end; i++) sum += arr[i];
+//   return sum / Math.max(1, end - from);
+// }
 
 /* 激しめ */
 function peak(arr: Uint8Array, from: number, to: number) {

@@ -1,4 +1,5 @@
 /**
+ * ・BLOB(Binary Large Object)
  * ・毎フレーム音のbandを取って、メッシュを変形＆色変化させる
  * ・音（bass/mid/treble） → 3Dオブジェクトの見た目（回転/スケール/形/色）に変換する
  */
@@ -35,6 +36,8 @@ export function Blob({ updateAudio, getBands, intensity, mode }: Props) {
    * useFrameを使用して毎フレーム動くループ処理を実行
    */
   useFrame((state) => {
+    const time = state.clock.getElapsedTime();
+
     // band更新
     updateAudio();
 
@@ -50,8 +53,9 @@ export function Blob({ updateAudio, getBands, intensity, mode }: Props) {
     /*
      * 回転とスケール（bassを利用）
      */
-    mesh.rotation.y += 0.003 + b * 0.01;
-    mesh.rotation.x += 0.0015;
+    const phase = time + b * 0.8;
+    mesh.rotation.y = Math.sin(phase * 0.25) * (0.25 + b * 0.15);
+    mesh.rotation.x = Math.sin(phase * 0.18) * 0.12;
     mesh.scale.setScalar(1 + b * 0.35);
 
     /*
@@ -68,7 +72,6 @@ export function Blob({ updateAudio, getBands, intensity, mode }: Props) {
     // 各頂点を “外側方向（法線っぽい方向）” に押し引きして波打たせる
     const base = basePositions.current;
     const arr = pos.array as Float32Array;
-    const time = state.clock.getElapsedTime();
 
     for (let i = 0; i < pos.count; i++) {
       const ix = i * 3;
@@ -87,7 +90,7 @@ export function Blob({ updateAudio, getBands, intensity, mode }: Props) {
         nz = z / len;
 
       // 外側方向にちょっと押し出したり戻したりする
-      const wobble = 1 + Math.sin(time * 2 + i * 0.02) * 0.08 * m;
+      const wobble = 1 + Math.sin(time * 0.5 + i * 0.012) * 0.08 * m;
 
       arr[ix + 0] = nx * wobble;
       arr[ix + 1] = ny * wobble;
@@ -132,7 +135,7 @@ export function Blob({ updateAudio, getBands, intensity, mode }: Props) {
    */
   return (
     <mesh ref={meshRef}>
-      <icosahedronGeometry args={[1, 64]} />
+      <icosahedronGeometry args={[1, 32]} />
       <meshStandardMaterial {...materialBase} />
     </mesh>
   );
