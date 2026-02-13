@@ -67,8 +67,24 @@ export function App() {
     }
   }, [audio.audioElRef])
 
+  /**
+   * band値確認用
+   */
+  const [bandsUI, setBandsUI] = useState({ bass: 0, mid: 0, treble: 0 });
+  useEffect(() => {
+    const id = window.setInterval(() => setBandsUI(audio.getBands()), 100);
+    return () => clearInterval(id);
+  }, [audio]);
+
   return (
     <div style={{ width: "100%", height: "100%", position: "relative" }}>
+      {/*
+        * band値確認用
+      */}
+      <Text size="xs" c="dimmed">
+        b:{bandsUI.bass.toFixed(2)} m:{bandsUI.mid.toFixed(2)} t:{bandsUI.treble.toFixed(2)}
+      </Text>
+
 
       {/* 背景WebGL */ }
       <VisualizerCanvas
@@ -141,7 +157,7 @@ export function App() {
                   setIsPlaying(false);
                 }}
                 styles={{
-                  
+
                 }}
               />
             </div>

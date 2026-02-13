@@ -17,8 +17,8 @@
 
 /**
  * band
- * FFTは最終的に1024本の配列にまとめられるが、細かすぎるので３つの値にまとめる。
- * bass, mid, treble。
+ * FFTは最終的に2000本の配列にまとめられるが、細かすぎるので３つの値にまとめる。
+ * bass, mid, trebleの３つの低〜高音域。
  * “スペクトラムのこの範囲の平均的な強さ”を表す簡易指標。
  */
 
@@ -26,11 +26,20 @@ import { useCallback, useMemo, useRef } from "react";
 
 export type Bands = { bass: number; mid: number; treble: number };
 
+/* 安定させる */
 function avg(arr: Uint8Array, from: number, to: number) {
   let sum = 0;
   const end = Math.min(arr.length, to);
   for (let i = from; i < end; i++) sum += arr[i];
   return sum / Math.max(1, end - from);
+}
+
+/* 激しめ */
+function peak(arr: Uint8Array, from: number, to: number) {
+  let m = 0;
+  const end = Math.min(arr.length, to);
+  for (let i = from; i < end; i++) if (arr[i] > m) m = arr[i];
+  return m;
 }
 
 export function useAudioAnalyser() {
@@ -86,7 +95,7 @@ export function useAudioAnalyser() {
     audioElRef.current.load();
   }, []);
 
-  /* play()、pause()：再生制御 */
+  /* play、pause：再生制御 */
   const play = useCallback(async () => {
     ensure();
     if (!ctxRef.current || !audioElRef.current) return;
@@ -121,11 +130,22 @@ export function useAudioAnalyser() {
     analyser.getByteFrequencyData(freq);
 
     // 帯域
-    const bass = avg(freq, 0, 20) / 255;
-    const mid = avg(freq, 20, 80) / 255;
-    const treble = avg(freq, 80, 180) / 255;
+    const bass = peak(freq, 2, 10) / 255;
+    const mid = peak(freq, 10, 60) / 255;
+    const treble = peak(freq, 60, 200) / 255;
 
-    bandsRef.current = { bass, mid, treble };
+    const prev = bandsRef.current;
+
+    const smooth = (p: number, n: number, a: number, r: number) => {
+      const k = n > p ? a : r;
+      return p + (n - p) * k;
+    };
+
+    bandsRef.current = {
+      bass: smooth(prev.bass, bass, 0.28, 0.05),
+      mid: smooth(prev.mid, mid, 0.22, 0.04),
+      treble: smooth(prev.treble, treble, 0.14, 0.02), // ←色は特にゆっくり
+    };
   }, []);
 
   /**
