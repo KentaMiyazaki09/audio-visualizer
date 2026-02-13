@@ -141,9 +141,7 @@ export function App() {
                   setIsPlaying(false);
                 }}
                 styles={{
-                  dropdown: { backgroundColor: "#fff" },
-                  option: { color: "#111" },
-                  label: { color: "#fff" },
+                  
                 }}
               />
             </div>
