@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
-import { Button, Group, Slider, SegmentedControl, Paper, Text, Select } from "@mantine/core";
+import { ActionIcon, Group, Slider, SegmentedControl, Paper, Select, Text } from "@mantine/core";
 import { useAudioAnalyser } from "./features/audio/useAudioAnalyser";
 import { VisualizerCanvas } from "./features/visual/VisualizerCanvas";
 import type { VisualMode } from "./features/visual/Blob";
+
+import IconStart from "/icons/start.svg";
+import IconPause from "/icons/pause.svg";
 
 /**
  * サンプル楽曲の一覧
@@ -79,11 +82,32 @@ export function App() {
       <audio ref={audio.audioElRef} />
 
       {/* UI */}
+      <div style={{ position: "absolute", left: "auto", right: 16, top: 16 }}>
+        <Group justify="space-between" align="top">
+          <SegmentedControl
+            fullWidth
+            value={mode}
+            onChange={(v) => setMode(v as VisualMode)}
+            data={[
+              { label: "Neon", value: "neon" },
+              { label: "Minimal", value: "minimal" },
+              { label: "Wire", value: "wire" },
+            ]}
+            styles={{
+              indicator: {
+                backgroundColor: "var(--mantine-color-brand-5)",
+              },
+            }}
+          />
+        </Group>
+      </div>
+
       <div style={{ position: "absolute", left: 16, right: 16, bottom: 16 }}>
-        <Group justify="space-between" align="end">
-          <Paper withBorder p="md" radius="md" style={{ backdropFilter: "blur(8px)", background: "rgba(16,18,24,0.65)" }}>
+        <Group>
+          <Paper p="md" radius="md" w={"100%"} style={{ maxWidth: "375px", backdropFilter: "blur(5px)", background: "rgba(42,42,42,0.9)" }}>
+            {/* ボタン */}
             <Group gap="md">
-              <Button
+              <ActionIcon
                 onClick={async () => {
                   const el = audio.audioElRef.current;
                   if (!el) return;
@@ -95,46 +119,39 @@ export function App() {
                     audio.pause();
                   }
                 }}
+                w={48}
+                h={48}
+                p={0}
+                radius="md"
               >
-                {isPlaying ? "Pause" : "Play"}
-              </Button>
-              <Text size="sm" c="dimmed">
-                {mode.toUpperCase()}
-              </Text>
+                <img src={ isPlaying ? IconPause : IconStart} alt="" />
+              </ActionIcon>
             </Group>
 
-            <Select
-              label="Track"
-              data={tracks}
-              value={trackSrc}
-              onChange={(v) => {
-                if (!v) return;
-                setTrackSrc(v);
-                audio.pause();
-                setIsPlaying(false);
-              }}
-              styles={{
-                dropdown: { backgroundColor: "#fff" },
-                option: { color: "#111" },
-                label: { color: "#fff" },
-              }}
-            />
-          </Paper>
-
-          <Paper withBorder p="md" radius="md" style={{ width: 320, backdropFilter: "blur(8px)", background: "rgba(16,18,24,0.65)" }}>
-            <SegmentedControl
-              fullWidth
-              value={mode}
-              onChange={(v) => setMode(v as VisualMode)}
-              data={[
-                { label: "Neon", value: "neon" },
-                { label: "Minimal", value: "minimal" },
-                { label: "Wire", value: "wire" },
-              ]}
-            />
+            {/* 楽曲セレクト */}
             <div style={{ marginTop: 14 }}>
+              <Text size="sm" mb={"5px"} c={"#A0A0A0"}>Tracks</Text>
+              <Select
+                data={tracks}
+                value={trackSrc}
+                onChange={(v) => {
+                  if (!v) return;
+                  setTrackSrc(v);
+                  audio.pause();
+                  setIsPlaying(false);
+                }}
+                styles={{
+                  dropdown: { backgroundColor: "#fff" },
+                  option: { color: "#111" },
+                  label: { color: "#fff" },
+                }}
+              />
+            </div>
+
+            {/* 調整 */}
+            <div style={{ marginTop: 14 }}>
+              <Text size="sm" c={"#A0A0A0"}>Volume</Text>
               <Slider
-                label="Volume"
                 value={Math.round(volume * 100)}
                 onChange={(v) => {
                   const nv = v / 100;
@@ -144,8 +161,8 @@ export function App() {
               />
             </div>
             <div style={{ marginTop: 14 }}>
+              <Text size="sm" c={"#A0A0A0"}>Intensity</Text>
               <Slider
-                label="Intensity"
                 value={Math.round(intensity * 50)}
                 onChange={(v) => setIntensity(v / 50)}
               />
@@ -153,6 +170,7 @@ export function App() {
           </Paper>
         </Group>
       </div>
+
     </div>
   );
 }

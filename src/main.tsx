@@ -23,6 +23,7 @@ const brand = [
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <MantineProvider
+      defaultColorScheme="dark"
       theme={{
         colors: { brand },
         primaryColor: "brand",
